@@ -11,6 +11,10 @@ export const BOOKS = [
     value: "book3",
     label: "Book 3",
   },
+  {
+    value: "book4",
+    label: "Book 4",
+  },
 ];
 
 export const SECTIONS = [
