@@ -40,7 +40,7 @@ export default function Navbar() {
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                  TopicVault
+                  Smart Book Search
                 </span>
               </div>
               <p className="text-xs text-slate-400 font-normal leading-none hidden sm:block">

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TopicVault | Book Knowledge & Topic Search",
+  title: "Smart Book Search | Book Knowledge & Topic Search",
   description:
     "Fast, intelligent topic search and indexing across your multi-volume book library.",
 };
