@@ -43,9 +43,6 @@ export default function Navbar() {
                   Smart Book Search
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-normal leading-none hidden sm:block">
-                Book Knowledge & Concept Index
-              </p>
             </div>
           </Link>
 
