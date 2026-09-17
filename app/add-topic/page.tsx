@@ -267,23 +267,6 @@ export default function AddTopic() {
                   );
                 })}
               </div>
-
-              {/* Native Dropdown Fallback */}
-              <div className="pt-1">
-                <select
-                  name="book"
-                  value={topicData.book}
-                  onChange={handleChange}
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950/70 border border-slate-700/80 text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
-                >
-                  <option value="">-- Or choose book from list --</option>
-                  {BOOKS.map((b) => (
-                    <option key={b.value} value={b.value}>
-                      {b.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
 
             {/* Section Selection */}
@@ -314,23 +297,6 @@ export default function AddTopic() {
                     </button>
                   );
                 })}
-              </div>
-
-              {/* Native Dropdown Fallback */}
-              <div className="pt-1">
-                <select
-                  name="section"
-                  value={topicData.section}
-                  onChange={handleChange}
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950/70 border border-slate-700/80 text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
-                >
-                  <option value="">-- Or choose section from list --</option>
-                  {SECTIONS.map((s) => (
-                    <option key={s.value} value={s.value}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
               </div>
             </div>
 
