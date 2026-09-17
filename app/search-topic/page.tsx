@@ -14,11 +14,10 @@ import {
   Filter,
   AlertCircle,
   RefreshCw,
-  ExternalLink,
   ChevronDown,
 } from "lucide-react";
 import axios from "axios";
-import { BOOKS, SECTIONS, SAMPLE_TOPICS } from "@/utilities/constants";
+import { BOOKS, SECTIONS } from "@/utilities/constants";
 import { searchTopicsApi, getApiBaseUrl } from "@/utilities/api";
 import { TopicData } from "@/utilities/interfaces";
 
@@ -36,7 +35,6 @@ function SearchTopicContent() {
   const [selectedBook, setSelectedBook] = useState<string>("all");
   const [selectedSection, setSelectedSection] = useState<string>("all");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [showDemoData, setShowDemoData] = useState<boolean>(false);
 
   // Trigger search
   const performSearch = async (queryToSearch: string) => {
@@ -47,7 +45,6 @@ function SearchTopicContent() {
     try {
       const results = await searchTopicsApi(queryToSearch);
       setTableData(results);
-      setShowDemoData(false);
     } catch (err: unknown) {
       console.error("Search API Error:", err);
       let errorText = "Failed to fetch topics from the server.";
@@ -59,7 +56,6 @@ function SearchTopicContent() {
         }
       }
       setErrorMessage(errorText);
-      // If error occurs, keep previous data or offer demo fallback
     } finally {
       setIsLoading(false);
     }
@@ -68,7 +64,6 @@ function SearchTopicContent() {
   // Initial search if query param provided
   useEffect(() => {
     if (initialQuery) {
-      setTopic(initialQuery);
       performSearch(initialQuery);
     }
   }, [initialQuery]);
@@ -78,24 +73,13 @@ function SearchTopicContent() {
     performSearch(topic);
   };
 
-  const handleClear = () => {
-    setTopic("");
-  };
-
-  const handleUseDemoData = () => {
-    setTableData(SAMPLE_TOPICS);
-    setShowDemoData(true);
-    setErrorMessage(null);
-    setHasSearched(true);
-  };
-
   const handleCopy = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  // Filtered and sorted data
+  // Filtered data based on selected book & section
   const filteredData = useMemo(() => {
     return tableData.filter((item) => {
       const matchesBook = selectedBook === "all" || item.book.toLowerCase() === selectedBook.toLowerCase();
@@ -109,7 +93,7 @@ function SearchTopicContent() {
     if (bookObj) {
       return (
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${bookObj.color.badge}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${bookObj.color.bg.replace('/10', '')} bg-current`}></span>
+          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
           {bookObj.label}
         </span>
       );
@@ -174,8 +158,8 @@ function SearchTopicContent() {
             {topic && (
               <button
                 type="button"
-                onClick={handleClear}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white"
+                onClick={() => setTopic("")}
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white cursor-pointer"
                 title="Clear search"
               >
                 <X className="w-4 h-4" />
@@ -203,7 +187,7 @@ function SearchTopicContent() {
         </form>
       </div>
 
-      {/* Error / Backend Alert with Demo Option */}
+      {/* Error / Backend Alert */}
       {errorMessage && (
         <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
@@ -213,21 +197,13 @@ function SearchTopicContent() {
               <p className="text-xs text-amber-200/80 mt-0.5">{errorMessage}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 self-end sm:self-auto">
-            <button
-              onClick={() => performSearch(topic)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/30 text-xs font-medium transition-all"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Retry</span>
-            </button>
-            <button
-              onClick={handleUseDemoData}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium shadow transition-all"
-            >
-              <span>Load Sample Preview Data</span>
-            </button>
-          </div>
+          <button
+            onClick={() => performSearch(topic)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/30 text-xs font-medium transition-all self-end sm:self-auto cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Retry</span>
+          </button>
         </div>
       )}
 
@@ -280,7 +256,7 @@ function SearchTopicContent() {
                   setSelectedBook("all");
                   setSelectedSection("all");
                 }}
-                className="text-xs text-indigo-400 hover:text-indigo-300 underline"
+                className="text-xs text-indigo-400 hover:text-indigo-300 underline cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -290,7 +266,6 @@ function SearchTopicContent() {
           <div className="flex items-center justify-between md:justify-end gap-3">
             <span className="text-xs text-slate-400 font-medium">
               Showing <strong className="text-white">{filteredData.length}</strong> of {tableData.length} results
-              {showDemoData && <span className="ml-1 text-indigo-400">(Preview Mode)</span>}
             </span>
           </div>
         </div>
@@ -316,16 +291,9 @@ function SearchTopicContent() {
           <div className="max-w-md mx-auto space-y-1">
             <h3 className="text-lg font-semibold text-white">Ready to Explore</h3>
             <p className="text-sm text-slate-400">
-              Enter any topic keyword above, or click one of the suggested search chips to inspect chapter and section locations.
+              Enter any topic keyword above to look up corresponding book volumes and section locations.
             </p>
           </div>
-          <button
-            onClick={handleUseDemoData}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 border border-slate-700 transition-colors"
-          >
-            <span>Explore Demo Data</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </button>
         </div>
       ) : filteredData.length === 0 ? (
         /* Empty State */
@@ -340,16 +308,17 @@ function SearchTopicContent() {
             </p>
           </div>
           <div className="flex items-center justify-center gap-3">
-            <button
-              onClick={() => {
-                setTopic("");
-                setSelectedBook("all");
-                setSelectedSection("all");
-              }}
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 transition-colors"
-            >
-              Clear Filters
-            </button>
+            {(selectedBook !== "all" || selectedSection !== "all") && (
+              <button
+                onClick={() => {
+                  setSelectedBook("all");
+                  setSelectedSection("all");
+                }}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 border border-slate-700 transition-colors cursor-pointer"
+              >
+                Reset Filters
+              </button>
+            )}
             <Link
               href="/add-topic"
               className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-medium text-white shadow transition-colors"

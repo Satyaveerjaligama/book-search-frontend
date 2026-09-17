@@ -9,8 +9,7 @@ import {
   PlusCircle,
   Compass,
   Menu,
-  X,
-  Sparkles,
+  X
 } from "lucide-react";
 
 export default function Navbar() {
