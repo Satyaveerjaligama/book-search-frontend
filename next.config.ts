@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   env: {
     API_URL: process.env.API_URL,
   },
-  basePath: '/book-search',
+  basePath: '/smart-book-search',
 };
 
 export default nextConfig;

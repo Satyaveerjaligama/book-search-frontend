@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { BOOKS, SECTIONS } from "@/utilities/constants";
-import { searchTopicsApi, getApiBaseUrl } from "@/utilities/api";
+import { searchTopicsApi } from "@/utilities/api";
 import { TopicData } from "@/utilities/interfaces";
 
 function SearchTopicContent() {
@@ -50,7 +50,7 @@ function SearchTopicContent() {
       let errorText = "Failed to fetch topics from the server.";
       if (axios.isAxiosError(err)) {
         if (!err.response) {
-          errorText = `Backend API at ${getApiBaseUrl()} is unreachable. Make sure your backend server is running.`;
+          errorText = "Unable to connect to the server. Please try again after sometime.";
         } else if (err.response.data && typeof err.response.data === "object" && "message" in err.response.data) {
           errorText = String((err.response.data as { message: string }).message);
         }
@@ -93,7 +93,7 @@ function SearchTopicContent() {
     if (bookObj) {
       return (
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${bookObj.color.badge}`}>
-          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+          <span className={`w-1.5 h-1.5 rounded-full ${bookObj.color.dot} shrink-0`}></span>
           {bookObj.label}
         </span>
       );
@@ -190,11 +190,10 @@ function SearchTopicContent() {
       {/* Error / Backend Alert */}
       {errorMessage && (
         <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
             <div>
-              <h4 className="text-sm font-semibold text-amber-300">Backend API Notice</h4>
-              <p className="text-xs text-amber-200/80 mt-0.5">{errorMessage}</p>
+              <p className="text-xs text-amber-200/80">{errorMessage}</p>
             </div>
           </div>
           <button

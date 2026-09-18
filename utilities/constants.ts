@@ -7,6 +7,9 @@ export interface BookOption {
     border: string;
     badge: string;
     gradient: string;
+    dot: string;
+    selected: string;
+    check: string;
   };
 }
 
@@ -25,6 +28,9 @@ export const BOOKS: BookOption[] = [
       border: "border-blue-500/30",
       badge: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800",
       gradient: "from-blue-600 to-cyan-500",
+      dot: "bg-blue-500",
+      selected: "bg-blue-600/20 border-blue-500 text-white shadow-md ring-2 ring-blue-500/30",
+      check: "text-blue-400",
     },
   },
   {
@@ -36,6 +42,9 @@ export const BOOKS: BookOption[] = [
       border: "border-purple-500/30",
       badge: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800",
       gradient: "from-purple-600 to-indigo-500",
+      dot: "bg-purple-500",
+      selected: "bg-purple-600/20 border-purple-500 text-white shadow-md ring-2 ring-purple-500/30",
+      check: "text-purple-400",
     },
   },
   {
@@ -47,6 +56,9 @@ export const BOOKS: BookOption[] = [
       border: "border-emerald-500/30",
       badge: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800",
       gradient: "from-emerald-600 to-teal-500",
+      dot: "bg-emerald-500",
+      selected: "bg-emerald-600/20 border-emerald-500 text-white shadow-md ring-2 ring-emerald-500/30",
+      check: "text-emerald-400",
     },
   },
   {
@@ -58,6 +70,9 @@ export const BOOKS: BookOption[] = [
       border: "border-amber-500/30",
       badge: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800",
       gradient: "from-amber-600 to-orange-500",
+      dot: "bg-amber-500",
+      selected: "bg-amber-600/20 border-amber-500 text-white shadow-md ring-2 ring-amber-500/30",
+      check: "text-amber-400",
     },
   },
 ];

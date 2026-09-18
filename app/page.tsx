@@ -96,10 +96,6 @@ export default function Home() {
                     <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
                     <span>Filter by Book volume and Section</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
-                    <span>One-click copy & fast retrieval</span>
-                  </div>
                 </div>
               </div>
 

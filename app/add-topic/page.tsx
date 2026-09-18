@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { BOOKS, SECTIONS } from "@/utilities/constants";
 import { TopicData } from "@/utilities/interfaces";
-import { addTopicApi, getApiBaseUrl } from "@/utilities/api";
+import { addTopicApi } from "@/utilities/api";
 
 export default function AddTopic() {
   const [topicData, setTopicData] = useState<TopicData>({
@@ -109,7 +109,7 @@ export default function AddTopic() {
       let errorText = "Failed to save topic to database.";
       if (axios.isAxiosError(err)) {
         if (!err.response) {
-          errorText = `Could not connect to backend server at ${getApiBaseUrl()}. Please verify your backend is running.`;
+          errorText = "Unable to connect to the server. Please try again after sometime.";
         } else if (err.response.data && typeof err.response.data === "object" && "message" in err.response.data) {
           errorText = String((err.response.data as { message: string }).message);
         }
@@ -208,16 +208,13 @@ export default function AddTopic() {
               <PlusCircle className="w-5 h-5 text-emerald-400" />
               <span>Topic Details</span>
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Fill in the concept title and pick the corresponding book volume and chapter section.
-            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Topic Input */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                Topic Title / Concept <span className="text-rose-400">*</span>
+                Topic <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
                 <input
@@ -225,14 +222,11 @@ export default function AddTopic() {
                   name="topic"
                   value={topicData.topic}
                   onChange={handleChange}
-                  placeholder="e.g. Distributed Consensus: Raft Protocol"
+                  placeholder="e.g. Redux Toolkit"
                   className="w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-700/80 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                   autoComplete="off"
                 />
               </div>
-              <p className="text-[11px] text-slate-500">
-                Be specific with keywords or algorithm names for effortless future search.
-              </p>
             </div>
 
             {/* Book Volume Selection */}
@@ -254,15 +248,15 @@ export default function AddTopic() {
                       key={book.value}
                       onClick={() => handleSelectPreset("book", book.value)}
                       className={`px-3 py-2.5 rounded-xl text-xs font-medium border flex items-center justify-between transition-all cursor-pointer ${isSelected
-                        ? `bg-indigo-600/20 border-indigo-500 text-white shadow-md ring-2 ring-indigo-500/20`
+                        ? book.color.selected
                         : "bg-slate-950/50 border-slate-800 text-slate-300 hover:bg-slate-800/80 hover:text-white"
                         }`}
                     >
                       <span className="flex items-center gap-1.5 truncate">
-                        <span className={`w-2 h-2 rounded-full ${book.color.bg.replace('/10', '')} bg-current`}></span>
+                        <span className={`w-2 h-2 rounded-full ${book.color.dot} shrink-0`}></span>
                         {book.label}
                       </span>
-                      {isSelected && <Check className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />}
+                      {isSelected && <Check className={`w-3.5 h-3.5 ${book.color.check} flex-shrink-0`} />}
                     </button>
                   );
                 })}
@@ -347,7 +341,7 @@ export default function AddTopic() {
                 {/* Book Badge */}
                 {currentBookObj ? (
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${currentBookObj.color.badge}`}>
-                    <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                    <span className={`w-1.5 h-1.5 rounded-full ${currentBookObj.color.dot} shrink-0`}></span>
                     {currentBookObj.label}
                   </span>
                 ) : (
@@ -368,7 +362,7 @@ export default function AddTopic() {
               {/* Topic Title Preview */}
               <div>
                 <span className="text-[10px] uppercase font-semibold text-slate-500 tracking-wider">
-                  Indexed Topic
+                  Topic
                 </span>
                 <h3 className="text-lg font-bold text-white mt-1 break-words leading-snug">
                   {topicData.topic || (
@@ -378,19 +372,6 @@ export default function AddTopic() {
                   )}
                 </h3>
               </div>
-            </div>
-
-            {/* Helpful Guide Card */}
-            <div className="rounded-2xl bg-indigo-950/20 border border-indigo-900/40 p-4 space-y-2 text-xs text-indigo-200/80">
-              <div className="flex items-center gap-2 text-indigo-300 font-medium">
-                <Info className="w-4 h-4 text-indigo-400" />
-                <span>Indexing Tips</span>
-              </div>
-              <ul className="list-disc list-inside space-y-1 text-slate-400 text-[11px] leading-relaxed">
-                <li>Use clean keywords (e.g. &ldquo;B-Tree Indexing&rdquo; instead of &ldquo;how does b-tree index work&rdquo;).</li>
-                <li>Tagging accurate book volume and section makes search instantaneous.</li>
-                <li>You can search for newly added topics immediately in the Search page.</li>
-              </ul>
             </div>
           </div>
         </div>
