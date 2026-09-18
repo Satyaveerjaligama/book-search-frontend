@@ -13,7 +13,6 @@ import {
   AlertCircle,
   ArrowRight,
   RefreshCw,
-  Info,
   Check,
 } from "lucide-react";
 import { BOOKS, SECTIONS } from "@/utilities/constants";

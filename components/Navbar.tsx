@@ -97,13 +97,6 @@ export default function Navbar() {
                 </Link>
               );
             })}
-            <div className="pt-2 px-4 flex items-center justify-between border-t border-slate-800/50 mt-2 text-xs text-slate-400">
-              <span className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                API Connected
-              </span>
-              <span className="font-mono text-slate-500">v1.0.0</span>
-            </div>
           </div>
         )}
       </div>

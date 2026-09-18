@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -12,10 +12,15 @@ import {
   Database,
   Zap,
 } from "lucide-react";
+import { pingApi } from "@/utilities/api";
 
 export default function Home() {
   const router = useRouter();
   const [quickQuery, setQuickQuery] = useState("");
+
+  useEffect(() => {
+    pingApi();
+  }, []);
 
   const handleQuickSearch = (e: React.FormEvent) => {
     e.preventDefault();

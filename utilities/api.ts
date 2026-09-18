@@ -33,4 +33,12 @@ export const addTopicApi = async (data: TopicData): Promise<{ status: number; me
   return { status: response.status, message: "Topic added successfully" };
 };
 
+export const pingApi = async (): Promise<void> => {
+  try {
+    await apiClient.get("/ping", { timeout: 60000 });
+  } catch {
+    // Silently ignore ping errors - wake-up call only
+  }
+};
+
 export const getApiBaseUrl = getBaseUrl;
