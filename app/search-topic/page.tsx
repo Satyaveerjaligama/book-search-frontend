@@ -9,8 +9,6 @@ import {
   Layers,
   ArrowLeft,
   X,
-  Copy,
-  Check,
   Filter,
   AlertCircle,
   RefreshCw,
@@ -30,27 +28,34 @@ function SearchTopicContent() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [inputError, setInputError] = useState<string | null>(null);
 
   // Filters state
   const [selectedBook, setSelectedBook] = useState<string>("all");
   const [selectedSection, setSelectedSection] = useState<string>("all");
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   // Trigger search
   const performSearch = async (queryToSearch: string) => {
+    const trimmedValue = queryToSearch.trim();
+    if (!trimmedValue) {
+      setInputError("Please enter a topic to search");
+      return;
+    }
+
+    setInputError(null);
     setIsLoading(true);
     setErrorMessage(null);
     setHasSearched(true);
 
     try {
-      const results = await searchTopicsApi(queryToSearch);
+      const results = await searchTopicsApi(trimmedValue);
       setTableData(results);
     } catch (err: unknown) {
       console.error("Search API Error:", err);
-      let errorText = "Failed to fetch topics from the server.";
+      let errorText = "Failed to fetch topics from the server";
       if (axios.isAxiosError(err)) {
         if (!err.response) {
-          errorText = "Unable to connect to the server. Please try again after sometime.";
+          errorText = "Unable to connect to the server. Please try again after sometime";
         } else if (err.response.data && typeof err.response.data === "object" && "message" in err.response.data) {
           errorText = String((err.response.data as { message: string }).message);
         }
@@ -63,20 +68,20 @@ function SearchTopicContent() {
 
   // Initial search if query param provided
   useEffect(() => {
-    if (initialQuery) {
-      performSearch(initialQuery);
+    if (initialQuery.trim()) {
+      performSearch(initialQuery.trim());
     }
   }, [initialQuery]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!topic.trim()) {
+      setInputError("Please enter a topic to search");
+      setErrorMessage(null);
+      return;
+    }
+    setInputError(null);
     performSearch(topic);
-  };
-
-  const handleCopy = (text: string, index: number) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
   };
 
   // Filtered data based on selected book & section
@@ -142,23 +147,34 @@ function SearchTopicContent() {
       </div>
 
       {/* Main Search Control Card */}
-      <div className="rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl backdrop-blur-xl p-6 space-y-4">
+      <div className="rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl backdrop-blur-xl p-6 space-y-3">
         <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative w-full">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <Search className="w-5 h-5 text-slate-400" />
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+              <Search className={`w-5 h-5 transition-colors ${inputError ? "text-rose-400" : "text-slate-400"}`} />
             </div>
             <input
               type="text"
               value={topic}
-              onChange={(e) => setTopic(e.target.value)}
+              onChange={(e) => {
+                setTopic(e.target.value);
+                if (inputError) setInputError(null);
+              }}
               placeholder="Search topic or concept (e.g. 'Binary Search', 'React', 'Trees')..."
-              className="w-full pl-10 pr-10 py-3 rounded-xl bg-slate-950/70 border border-slate-700/80 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+              aria-invalid={!!inputError}
+              aria-describedby={inputError ? "topic-error-msg" : undefined}
+              className={`w-full pl-10 pr-10 py-3 rounded-xl bg-slate-950/70 border text-white placeholder-slate-500 text-sm focus:outline-none transition-all ${inputError
+                  ? "border-rose-500/80 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 shadow-sm shadow-rose-950/30"
+                  : "border-slate-700/80 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                }`}
             />
             {topic && (
               <button
                 type="button"
-                onClick={() => setTopic("")}
+                onClick={() => {
+                  setTopic("");
+                  if (inputError) setInputError(null);
+                }}
                 className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white cursor-pointer"
                 title="Clear search"
               >
@@ -185,6 +201,18 @@ function SearchTopicContent() {
             )}
           </button>
         </form>
+
+        {/* Input Validation Error */}
+        {inputError && (
+          <div
+            id="topic-error-msg"
+            role="alert"
+            className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs sm:text-sm font-medium"
+          >
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{inputError}</span>
+          </div>
+        )}
       </div>
 
       {/* Error / Backend Alert */}
@@ -336,7 +364,6 @@ function SearchTopicContent() {
                   <th className="py-3.5 px-6">Topic Name</th>
                   <th className="py-3.5 px-6">Book Volume</th>
                   <th className="py-3.5 px-6">Section Location</th>
-                  <th className="py-3.5 px-6 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 text-sm">
@@ -356,25 +383,6 @@ function SearchTopicContent() {
                     </td>
                     <td className="py-4 px-6">
                       {getSectionBadge(row.section)}
-                    </td>
-                    <td className="py-4 px-6 text-right">
-                      <button
-                        onClick={() => handleCopy(row.topic, index)}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 hover:text-white border border-slate-700 transition-colors cursor-pointer"
-                        title="Copy topic name"
-                      >
-                        {copiedIndex === index ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
-                            <span className="text-emerald-400">Copied!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5 text-slate-400" />
-                            <span>Copy</span>
-                          </>
-                        )}
-                      </button>
                     </td>
                   </tr>
                 ))}

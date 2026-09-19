@@ -3,3 +3,7 @@ export interface TopicData {
   book: string;
   section: string;
 }
+
+export interface AddTopicPayload extends TopicData {
+  adminKey?: string;
+}

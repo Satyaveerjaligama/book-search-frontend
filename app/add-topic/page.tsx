@@ -14,6 +14,8 @@ import {
   ArrowRight,
   RefreshCw,
   Check,
+  KeyRound,
+  X,
 } from "lucide-react";
 import { BOOKS, SECTIONS } from "@/utilities/constants";
 import { TopicData } from "@/utilities/interfaces";
@@ -25,8 +27,6 @@ export default function AddTopic() {
     book: "",
     section: "",
   });
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [submittedTopic, setSubmittedTopic] = useState<TopicData | null>(null);
   const [message, setMessage] = useState<{
     text: string;
@@ -35,6 +35,11 @@ export default function AddTopic() {
     text: "",
     status: null,
   });
+
+  // Admin Key Modal State
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [adminKeyInput, setAdminKeyInput] = useState<string>("");
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -71,33 +76,70 @@ export default function AddTopic() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Form submission: Validate fields and open the Admin Key Modal
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const { topic, book, section } = topicData;
 
     if (!topic.trim()) {
-      setMessage({ text: "Please provide a topic title or concept name.", status: "error" });
+      setMessage({ text: "Please provide a topic title", status: "error" });
       return;
     }
     if (!book) {
-      setMessage({ text: "Please select a book volume.", status: "error" });
+      setMessage({ text: "Please select a book volume", status: "error" });
       return;
     }
     if (!section) {
-      setMessage({ text: "Please select a section.", status: "error" });
+      setMessage({ text: "Please select a section", status: "error" });
       return;
     }
 
-    setIsLoading(true);
+    // Required fields are valid -> Open Admin Key verification modal
     setMessage({ text: "", status: null });
+    setAdminKeyInput("");
+    setIsModalOpen(true);
+  };
+
+  // 1. User skips the admin key -> close modal and show permission error
+  const handleSkipAdminKey = () => {
+    setIsModalOpen(false);
+    setAdminKeyInput("");
+    setMessage({
+      text: "Only the administrator has permission to write/save data",
+      status: "error",
+    });
+  };
+
+  // Close modal without notice (e.g. clicking 'X' or backdrop)
+  const handleCloseModal = () => {
+    if (!isVerifying) {
+      setIsModalOpen(false);
+      setAdminKeyInput("");
+    }
+  };
+
+  // 2, 3, 4. User submits admin key (or submits empty input)
+  const handleModalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedKey = adminKeyInput.trim();
+
+    // If key is omitted or empty, treat as skip
+    if (!trimmedKey) {
+      handleSkipAdminKey();
+      return;
+    }
+
+    setIsVerifying(true);
 
     try {
-      const response = await addTopicApi(topicData);
+      const response = await addTopicApi(topicData, trimmedKey);
       if (response.status === 201 || response.status === 200) {
+        setIsModalOpen(false);
+        setAdminKeyInput("");
         fireSuccessConfetti();
         setSubmittedTopic({ ...topicData });
         setMessage({
-          text: `"${topicData.topic}" successfully indexed to ${book.toUpperCase()} (${section.toUpperCase()})!`,
+          text: `"${topicData.topic}" successfully indexed to ${topicData.book.toUpperCase()} - ${topicData.section.toUpperCase()}`,
           status: "success",
         });
         // Clear form
@@ -105,22 +147,38 @@ export default function AddTopic() {
       }
     } catch (err: unknown) {
       console.error("Add Topic API Error:", err);
-      let errorText = "Failed to save topic to database.";
-      if (axios.isAxiosError(err)) {
-        if (!err.response) {
-          errorText = "Unable to connect to the server. Please try again after sometime.";
-        } else if (err.response.data && typeof err.response.data === "object" && "message" in err.response.data) {
-          errorText = String((err.response.data as { message: string }).message);
-        }
+      setIsModalOpen(false);
+      setAdminKeyInput("");
+
+      if (axios.isAxiosError(err) && (err.response?.status === 401 || err.response?.status === 403)) {
+        // 401 Unauthorized / 403 Forbidden
+        setMessage({
+          text: "Only the administrator has permission to write/save data",
+          status: "error",
+        });
+      } else {
+        // General API error (network issue, 500, timeout)
+        setMessage({
+          text: "Something went wrong, please try again later",
+          status: "error",
+        });
       }
-      setMessage({
-        text: errorText,
-        status: "error",
-      });
     } finally {
-      setIsLoading(false);
+      setIsVerifying(false);
     }
   };
+
+  // Close modal when Escape key is pressed
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isModalOpen && !isVerifying) {
+        setIsModalOpen(false);
+        setAdminKeyInput("");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isModalOpen, isVerifying]);
 
   const currentBookObj = BOOKS.find((b) => b.value === topicData.book);
   const currentSectionObj = SECTIONS.find((s) => s.value === topicData.section);
@@ -297,20 +355,10 @@ export default function AddTopic() {
             <div className="pt-4 flex flex-col sm:flex-row items-center gap-3">
               <button
                 type="submit"
-                disabled={isLoading}
-                className="w-full sm:flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-semibold shadow-lg shadow-emerald-600/20 transition-all cursor-pointer disabled:opacity-50"
+                className="w-full sm:flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-semibold shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
               >
-                {isLoading ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Saving to Database...</span>
-                  </>
-                ) : (
-                  <>
-                    <PlusCircle className="w-4 h-4" />
-                    <span>Index Topic Now</span>
-                  </>
-                )}
+                <PlusCircle className="w-4 h-4" />
+                <span>Index Topic Now</span>
               </button>
 
               <button
@@ -376,6 +424,95 @@ export default function AddTopic() {
         </div>
 
       </div>
+
+      {/* Admin Key Verification Modal */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) handleCloseModal();
+          }}
+        >
+          <div
+            className="w-full max-w-md rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-7 shadow-2xl space-y-5 text-left relative"
+            role="dialog"
+            aria-modal="true"
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                  <KeyRound className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-white">Admin Verification</h3>
+                  <p className="text-xs text-slate-400">Portfolio Showcase Mode</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                disabled={isVerifying}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Description */}
+            <p className="text-xs text-slate-300 leading-relaxed">
+              This application is a live portfolio project. To protect the database from unauthorized modifications, saving topics requires an admin passcode.
+            </p>
+
+            {/* Admin Key Form */}
+            <form onSubmit={handleModalSubmit} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-medium text-slate-300">
+                  Admin Key <span className="text-slate-500 font-normal">(Optional)</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    value={adminKeyInput}
+                    onChange={(e) => setAdminKeyInput(e.target.value)}
+                    disabled={isVerifying}
+                    autoFocus
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all disabled:opacity-50"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleSkipAdminKey}
+                  disabled={isVerifying}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  Skip (Demo Mode)
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isVerifying}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-semibold shadow-lg shadow-emerald-600/20 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {isVerifying ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Verifying...</span>
+                    </>
+                  ) : (
+                    <span>Submit & Save</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

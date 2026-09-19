@@ -24,11 +24,15 @@ export const searchTopicsApi = async (topic: string): Promise<TopicData[]> => {
   return response.data;
 };
 
-export const addTopicApi = async (data: TopicData): Promise<{ status: number; message: string }> => {
+export const addTopicApi = async (
+  data: TopicData,
+  adminKey?: string
+): Promise<{ status: number; message: string }> => {
   const response = await apiClient.post("/add-topic", {
     topic: data.topic.trim(),
     book: data.book,
     section: data.section,
+    adminKey: adminKey || "",
   });
   return { status: response.status, message: "Topic added successfully" };
 };
