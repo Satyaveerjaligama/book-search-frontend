@@ -16,6 +16,8 @@ import {
   Check,
   KeyRound,
   X,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { BOOKS, SECTIONS } from "@/utilities/constants";
 import { TopicData } from "@/utilities/interfaces";
@@ -39,6 +41,7 @@ export default function AddTopic() {
   // Admin Key Modal State
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [adminKeyInput, setAdminKeyInput] = useState<string>("");
+  const [showAdminKey, setShowAdminKey] = useState<boolean>(false);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
 
   const handleChange = (
@@ -97,6 +100,7 @@ export default function AddTopic() {
     // Required fields are valid -> Open Admin Key verification modal
     setMessage({ text: "", status: null });
     setAdminKeyInput("");
+    setShowAdminKey(false);
     setIsModalOpen(true);
   };
 
@@ -104,6 +108,7 @@ export default function AddTopic() {
   const handleSkipAdminKey = () => {
     setIsModalOpen(false);
     setAdminKeyInput("");
+    setShowAdminKey(false);
     setMessage({
       text: "Only the administrator has permission to write/save data",
       status: "error",
@@ -115,6 +120,7 @@ export default function AddTopic() {
     if (!isVerifying) {
       setIsModalOpen(false);
       setAdminKeyInput("");
+      setShowAdminKey(false);
     }
   };
 
@@ -136,6 +142,7 @@ export default function AddTopic() {
       if (response.status === 201 || response.status === 200) {
         setIsModalOpen(false);
         setAdminKeyInput("");
+        setShowAdminKey(false);
         fireSuccessConfetti();
         setSubmittedTopic({ ...topicData });
         setMessage({
@@ -149,6 +156,7 @@ export default function AddTopic() {
       console.error("Add Topic API Error:", err);
       setIsModalOpen(false);
       setAdminKeyInput("");
+      setShowAdminKey(false);
 
       if (axios.isAxiosError(err) && (err.response?.status === 401 || err.response?.status === 403)) {
         // 401 Unauthorized / 403 Forbidden
@@ -174,6 +182,7 @@ export default function AddTopic() {
       if (e.key === "Escape" && isModalOpen && !isVerifying) {
         setIsModalOpen(false);
         setAdminKeyInput("");
+        setShowAdminKey(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -446,7 +455,6 @@ export default function AddTopic() {
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-white">Admin Verification</h3>
-                  <p className="text-xs text-slate-400">Portfolio Showcase Mode</p>
                 </div>
               </div>
               <button
@@ -461,7 +469,7 @@ export default function AddTopic() {
 
             {/* Description */}
             <p className="text-xs text-slate-300 leading-relaxed">
-              This application is a live portfolio project. To protect the database from unauthorized modifications, saving topics requires an admin passcode.
+              This application serves as a public showcase. To protect the database from unauthorized modifications, saving topics requires an admin passcode.
             </p>
 
             {/* Admin Key Form */}
@@ -472,13 +480,27 @@ export default function AddTopic() {
                 </label>
                 <div className="relative">
                   <input
-                    type="password"
+                    type={showAdminKey ? "text" : "password"}
                     value={adminKeyInput}
                     onChange={(e) => setAdminKeyInput(e.target.value)}
                     disabled={isVerifying}
                     autoFocus
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all disabled:opacity-50"
+                    className="w-full px-4 py-2.5 pr-11 rounded-xl bg-slate-950 border border-slate-700 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all disabled:opacity-50"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowAdminKey((prev) => !prev)}
+                    disabled={isVerifying}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 p-1 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                    tabIndex={-1}
+                    aria-label={showAdminKey ? "Hide admin key" : "Show admin key"}
+                  >
+                    {showAdminKey ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
                 </div>
               </div>
 
