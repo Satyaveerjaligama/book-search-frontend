@@ -1,6 +1,7 @@
 export interface BookOption {
   value: string;
   label: string;
+  hasVolumes?: boolean;
   color: {
     bg: string;
     text: string;
@@ -22,6 +23,7 @@ export const BOOKS: BookOption[] = [
   {
     value: "book1",
     label: "Book 1",
+    hasVolumes: true,
     color: {
       bg: "bg-blue-500/10",
       text: "text-blue-600 dark:text-blue-400",
@@ -36,6 +38,7 @@ export const BOOKS: BookOption[] = [
   {
     value: "book2",
     label: "Book 2",
+    hasVolumes: true,
     color: {
       bg: "bg-purple-500/10",
       text: "text-purple-600 dark:text-purple-400",
@@ -50,6 +53,7 @@ export const BOOKS: BookOption[] = [
   {
     value: "book3",
     label: "Book 3",
+    hasVolumes: true,
     color: {
       bg: "bg-emerald-500/10",
       text: "text-emerald-600 dark:text-emerald-400",
@@ -64,6 +68,7 @@ export const BOOKS: BookOption[] = [
   {
     value: "book4",
     label: "Book 4",
+    hasVolumes: true,
     color: {
       bg: "bg-amber-500/10",
       text: "text-amber-600 dark:text-amber-400",
@@ -73,6 +78,21 @@ export const BOOKS: BookOption[] = [
       dot: "bg-amber-500",
       selected: "bg-amber-600/20 border-amber-500 text-white shadow-md ring-2 ring-amber-500/30",
       check: "text-amber-400",
+    },
+  },
+  {
+    value: "book5",
+    label: "Book 5",
+    hasVolumes: false,
+    color: {
+      bg: "bg-rose-500/10",
+      text: "text-rose-600 dark:text-rose-400",
+      border: "border-rose-500/30",
+      badge: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800",
+      gradient: "from-rose-600 to-pink-500",
+      dot: "bg-rose-500",
+      selected: "bg-rose-600/20 border-rose-500 text-white shadow-md ring-2 ring-rose-500/30",
+      check: "text-rose-400",
     },
   },
 ];

@@ -87,14 +87,18 @@ function SearchTopicContent() {
   // Filtered data based on selected book & section
   const filteredData = useMemo(() => {
     return tableData.filter((item) => {
-      const matchesBook = selectedBook === "all" || item.book.toLowerCase() === selectedBook.toLowerCase();
-      const matchesSection = selectedSection === "all" || item.section.toLowerCase() === selectedSection.toLowerCase();
+      const matchesBook =
+        selectedBook === "all" ||
+        (item.book && item.book.toLowerCase() === selectedBook.toLowerCase());
+      const matchesSection =
+        selectedSection === "all" ||
+        (item.section && item.section.toLowerCase() === selectedSection.toLowerCase());
       return matchesBook && matchesSection;
     });
   }, [tableData, selectedBook, selectedSection]);
 
   const getBookBadge = (bookValue: string) => {
-    const bookObj = BOOKS.find((b) => b.value.toLowerCase() === bookValue.toLowerCase());
+    const bookObj = BOOKS.find((b) => b.value.toLowerCase() === (bookValue || "").toLowerCase());
     if (bookObj) {
       return (
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${bookObj.color.badge}`}>
@@ -110,7 +114,14 @@ function SearchTopicContent() {
     );
   };
 
-  const getSectionBadge = (sectionValue: string) => {
+  const getSectionBadge = (sectionValue?: string) => {
+    if (!sectionValue || !sectionValue.trim()) {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-mono text-slate-500 bg-slate-900/60 border border-slate-800">
+          NA
+        </span>
+      );
+    }
     const sectionObj = SECTIONS.find((s) => s.value.toLowerCase() === sectionValue.toLowerCase());
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-mono font-medium bg-slate-800/80 text-slate-300 border border-slate-700/60">

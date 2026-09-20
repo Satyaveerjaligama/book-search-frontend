@@ -31,7 +31,7 @@ export const addTopicApi = async (
   const response = await apiClient.post("/add-topic", {
     topic: data.topic.trim(),
     book: data.book,
-    section: data.section,
+    section: data.book === "book5" ? "" : (data.section || ""),
     adminKey: adminKey || "",
   });
   return { status: response.status, message: "Topic added successfully" };

@@ -47,10 +47,12 @@ export default function AddTopic() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setTopicData({
-      ...topicData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setTopicData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "book" && value === "book5" ? { section: "" } : {}),
+    }));
     if (message.status) {
       setMessage({ text: "", status: null });
     }
@@ -60,6 +62,7 @@ export default function AddTopic() {
     setTopicData((prev) => ({
       ...prev,
       [name]: value,
+      ...(name === "book" && value === "book5" ? { section: "" } : {}),
     }));
     if (message.status) {
       setMessage({ text: "", status: null });
@@ -89,10 +92,12 @@ export default function AddTopic() {
       return;
     }
     if (!book) {
-      setMessage({ text: "Please select a book volume", status: "error" });
+      setMessage({ text: "Please select a book", status: "error" });
       return;
     }
-    if (!section) {
+    const selectedBookObj = BOOKS.find((b) => b.value === book);
+    const requiresSection = selectedBookObj ? selectedBookObj.hasVolumes !== false : book !== "book5";
+    if (requiresSection && !section) {
       setMessage({ text: "Please select a section", status: "error" });
       return;
     }
@@ -145,8 +150,11 @@ export default function AddTopic() {
         setShowAdminKey(false);
         fireSuccessConfetti();
         setSubmittedTopic({ ...topicData });
+        const targetLocation = topicData.section
+          ? `${topicData.book.toUpperCase()} - ${topicData.section.toUpperCase()}`
+          : topicData.book.toUpperCase();
         setMessage({
-          text: `"${topicData.topic}" successfully indexed to ${topicData.book.toUpperCase()} - ${topicData.section.toUpperCase()}`,
+          text: `"${topicData.topic}" successfully indexed to ${targetLocation}`,
           status: "success",
         });
         // Clear form
@@ -295,17 +303,17 @@ export default function AddTopic() {
               </div>
             </div>
 
-            {/* Book Volume Selection */}
+            {/* Book Selection */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
                 <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                  Book Volume <span className="text-rose-400">*</span>
+                  Book <span className="text-rose-400">*</span>
                 </label>
                 <span className="text-[11px] text-slate-400">Click preset or select</span>
               </div>
 
               {/* Quick Select Chips for Books */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
                 {BOOKS.map((book) => {
                   const isSelected = topicData.book === book.value;
                   return (
@@ -329,36 +337,38 @@ export default function AddTopic() {
               </div>
             </div>
 
-            {/* Section Selection */}
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between">
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                  Section Location <span className="text-rose-400">*</span>
-                </label>
-                <span className="text-[11px] text-slate-400">Select section (1 - 5)</span>
-              </div>
+            {/* Volume / Section Selection - Hidden for Book 5 */}
+            {currentBookObj?.hasVolumes !== false && (
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Section <span className="text-rose-400">*</span>
+                  </label>
+                  <span className="text-[11px] text-slate-400">Select section (1 - 5)</span>
+                </div>
 
-              {/* Quick Select Chips for Sections */}
-              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                {SECTIONS.map((section) => {
-                  const isSelected = topicData.section === section.value;
-                  return (
-                    <button
-                      type="button"
-                      key={section.value}
-                      onClick={() => handleSelectPreset("section", section.value)}
-                      className={`px-2.5 py-2 rounded-xl text-xs font-medium border flex items-center justify-center gap-1 transition-all cursor-pointer ${isSelected
-                        ? "bg-emerald-600/20 border-emerald-500 text-emerald-300 shadow-md ring-2 ring-emerald-500/20"
-                        : "bg-slate-950/50 border-slate-800 text-slate-400 hover:bg-slate-800/80 hover:text-white"
-                        }`}
-                    >
-                      <Layers className="w-3 h-3" />
-                      <span>{section.label.replace("Section ", "Sec ")}</span>
-                    </button>
-                  );
-                })}
+                {/* Quick Select Chips for Sections */}
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                  {SECTIONS.map((section) => {
+                    const isSelected = topicData.section === section.value;
+                    return (
+                      <button
+                        type="button"
+                        key={section.value}
+                        onClick={() => handleSelectPreset("section", section.value)}
+                        className={`px-2.5 py-2 rounded-xl text-xs font-medium border flex items-center justify-center gap-1 transition-all cursor-pointer ${isSelected
+                          ? "bg-emerald-600/20 border-emerald-500 text-emerald-300 shadow-md ring-2 ring-emerald-500/20"
+                          : "bg-slate-950/50 border-slate-800 text-slate-400 hover:bg-slate-800/80 hover:text-white"
+                          }`}
+                      >
+                        <Layers className="w-3 h-3" />
+                        <span>{section.label.replace("Section ", "Sec ")}</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Form Actions */}
             <div className="pt-4 flex flex-col sm:flex-row items-center gap-3">
@@ -405,13 +415,17 @@ export default function AddTopic() {
                 )}
 
                 {/* Section Badge */}
-                {currentSectionObj ? (
+                {currentBookObj?.hasVolumes === false ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-mono font-medium bg-slate-800/80 text-slate-400 border border-slate-700/60">
+                    No Volume
+                  </span>
+                ) : currentSectionObj ? (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-mono font-medium bg-slate-800 text-slate-300 border border-slate-700">
                     <Layers className="w-3 h-3 text-slate-400" />
                     {currentSectionObj.label}
                   </span>
                 ) : (
-                  <span className="text-xs text-slate-500 italic">No section</span>
+                  <span className="text-xs text-slate-500 italic">No volume</span>
                 )}
               </div>
 
