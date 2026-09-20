@@ -329,7 +329,7 @@ function SearchTopicContent() {
           <div className="max-w-md mx-auto space-y-1">
             <h3 className="text-lg font-semibold text-white">Ready to Explore</h3>
             <p className="text-sm text-slate-400">
-              Enter any topic keyword above to look up corresponding book volumes and section locations.
+              Enter any topic keyword above to look up corresponding book and section.
             </p>
           </div>
         </div>
@@ -372,9 +372,9 @@ function SearchTopicContent() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-800 bg-slate-950/60 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  <th className="py-3.5 px-6">Topic Name</th>
-                  <th className="py-3.5 px-6">Book Volume</th>
-                  <th className="py-3.5 px-6">Section Location</th>
+                  <th className="py-3.5 px-6">Topic</th>
+                  <th className="py-3.5 px-6">Book</th>
+                  <th className="py-3.5 px-6">Section</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 text-sm">
