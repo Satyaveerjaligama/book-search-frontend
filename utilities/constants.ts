@@ -104,14 +104,3 @@ export const SECTIONS: SectionOption[] = [
   { value: "section4", label: "Section 4" },
   { value: "section5", label: "Section 5" },
 ];
-
-export const SAMPLE_TOPICS = [
-  { topic: "Binary Search Trees & Balancing", book: "book1", section: "section2" },
-  { topic: "Asynchronous JavaScript & Event Loop", book: "book2", section: "section1" },
-  { topic: "Database Indexing & B-Trees", book: "book1", section: "section4" },
-  { topic: "React Fiber Architecture & Reconciliation", book: "book2", section: "section3" },
-  { topic: "Distributed Consensus: Raft & Paxos", book: "book3", section: "section1" },
-  { topic: "Zero-Knowledge Proofs & Cryptography", book: "book4", section: "section5" },
-  { topic: "Memory Management & Garbage Collection", book: "book3", section: "section3" },
-  { topic: "REST vs GraphQL API Design", book: "book2", section: "section4" },
-];

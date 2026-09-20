@@ -42,7 +42,7 @@ export default function Home() {
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
             Find Any Concept Across Your{" "}
             <span className="bg-gradient-to-r from-indigo-400 via-sky-300 to-emerald-400 bg-clip-text text-transparent">
-              Book Library
+              Books
             </span>
           </h1>
 
@@ -57,7 +57,7 @@ export default function Home() {
                 type="text"
                 value={quickQuery}
                 onChange={(e) => setQuickQuery(e.target.value)}
-                placeholder="Search topics (e.g. 'Binary Search', 'React Hooks', 'Indexing')..."
+                placeholder="Search topics (e.g. 'React', 'Typescript')"
                 className="w-full bg-transparent text-white placeholder-slate-500 text-sm sm:text-base focus:outline-none px-2"
               />
               <button
@@ -89,19 +89,8 @@ export default function Home() {
                     Search Topics
                   </h3>
                   <p className="text-slate-400 text-sm mt-2 leading-relaxed">
-                    Lookup concepts across books and sections. View results in an interactive data table or card grid, filter by volume, and copy entries.
+                    Lookup concepts across books and sections. View results in a table, filter by books, and sections.
                   </p>
-                </div>
-
-                <div className="space-y-2 pt-2 text-xs text-slate-300">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
-                    <span>Interactive table</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
-                    <span>Filter by Book volume and Section</span>
-                  </div>
                 </div>
               </div>
 
@@ -130,23 +119,8 @@ export default function Home() {
                     Add New Topic
                   </h3>
                   <p className="text-slate-400 text-sm mt-2 leading-relaxed">
-                    Contribute new topics to your database. Features an interactive form with quick presets and a live preview card that updates in real time.
+                    Add new topics to your database. Features an interactive form with quick presets and a live preview card that updates in real time.
                   </p>
-                </div>
-
-                <div className="space-y-2 pt-2 text-xs text-slate-300">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
-                    <span>Real-time visual catalog entry preview</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
-                    <span>One-click Book & Section quick selection</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
-                    <span>Instant database sync</span>
-                  </div>
                 </div>
               </div>
 

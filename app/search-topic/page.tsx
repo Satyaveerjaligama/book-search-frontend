@@ -171,7 +171,7 @@ function SearchTopicContent() {
                 setTopic(e.target.value);
                 if (inputError) setInputError(null);
               }}
-              placeholder="Search topic or concept (e.g. 'Binary Search', 'React', 'Trees')..."
+              placeholder="Search topic (e.g. 'React Hooks', 'Event Loop')"
               aria-invalid={!!inputError}
               aria-describedby={inputError ? "topic-error-msg" : undefined}
               className={`w-full pl-10 pr-10 py-3 rounded-xl bg-slate-950/70 border text-white placeholder-slate-500 text-sm focus:outline-none transition-all ${inputError
