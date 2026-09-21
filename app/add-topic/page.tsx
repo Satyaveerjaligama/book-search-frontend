@@ -82,6 +82,18 @@ export default function AddTopic() {
     }
   };
 
+  const scrollToTop = () => {
+    if (typeof window !== "undefined") {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 100);
+    }
+  };
+
   // Form submission: Validate fields and open the Admin Key Modal
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,16 +101,19 @@ export default function AddTopic() {
 
     if (!topic.trim()) {
       setMessage({ text: "Please provide a topic title", status: "error" });
+      scrollToTop();
       return;
     }
     if (!book) {
       setMessage({ text: "Please select a book", status: "error" });
+      scrollToTop();
       return;
     }
     const selectedBookObj = BOOKS.find((b) => b.value === book);
     const requiresSection = selectedBookObj ? selectedBookObj.hasVolumes !== false : book !== "book5";
     if (requiresSection && !section) {
       setMessage({ text: "Please select a section", status: "error" });
+      scrollToTop();
       return;
     }
 
@@ -118,6 +133,7 @@ export default function AddTopic() {
       text: "Only the administrator has permission to write/save data",
       status: "error",
     });
+    scrollToTop();
   };
 
   // Close modal without notice (e.g. clicking 'X' or backdrop)
@@ -159,6 +175,7 @@ export default function AddTopic() {
         });
         // Clear form
         setTopicData({ topic: "", book: "", section: "" });
+        scrollToTop();
       }
     } catch (err: unknown) {
       console.error("Add Topic API Error:", err);
@@ -179,6 +196,7 @@ export default function AddTopic() {
           status: "error",
         });
       }
+      scrollToTop();
     } finally {
       setIsVerifying(false);
     }
@@ -233,7 +251,12 @@ export default function AddTopic() {
 
       {/* Success Notification Banner */}
       {message.status === "success" && (
-        <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+        <div
+          id="success-banner"
+          role="alert"
+          aria-live="polite"
+          className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl"
+        >
           <div className="flex items-start gap-3">
             <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0 mt-0.5" />
             <div>
@@ -263,7 +286,12 @@ export default function AddTopic() {
 
       {/* Error Notification Banner */}
       {message.status === "error" && (
-        <div className="rounded-2xl bg-rose-500/10 border border-rose-500/30 p-4 flex items-start gap-3 shadow-lg">
+        <div
+          id="error-banner"
+          role="alert"
+          aria-live="assertive"
+          className="rounded-2xl bg-rose-500/10 border border-rose-500/30 p-4 flex items-start gap-3 shadow-lg"
+        >
           <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
           <div>
             <h4 className="text-sm font-semibold text-rose-300">Submission Notice</h4>
@@ -377,7 +405,7 @@ export default function AddTopic() {
                 className="w-full sm:flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-semibold shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Index Topic Now</span>
+                <span>Add Topic</span>
               </button>
 
               <button
